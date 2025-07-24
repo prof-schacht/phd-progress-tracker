@@ -59,13 +59,13 @@ PhD Progress Tracker provides a centralized platform that:
 ```
 
 ### Tech Stack
-- **Frontend**: React/Vue.js with TypeScript
-- **Backend**: Fastapi with Python
-- **Database**: PostgreSQL with Redis for caching
+- **Frontend**: React with TypeScript + Vite + TailwindCSS
+- **Backend**: FastAPI with Python 3.11+
+- **Database**: PostgreSQL 16 with Redis for caching
 - **Authentication**: JWT with optional SSO (SAML/OAuth2)
 - **Real-time**: WebSockets for live updates
-- **Job Queue**: Bull/BullMQ for reminders and notifications
-- **File Storage**: File System object storage
+- **Job Queue**: Celery for reminders and notifications
+- **Container**: Docker & Docker Compose for development
 
 ## 📊 Data Model Overview
 
@@ -81,54 +81,94 @@ PhD Progress Tracker provides a centralized platform that:
 ## 🛠️ Installation
 
 ### Prerequisites
-- Node.js 18+ 
-- PostgreSQL 14+
-- Fastapi
-- Redis 6+
-- npm or yarn
+- Docker 20+ and Docker Compose
+- Python 3.11+ (for backend development)
+- Node.js 20+ (for frontend development)
+- uv (Python package manager)
 
-### Quick Start
+### Quick Start with Docker (Recommended)
 
 ```bash
 # Clone the repository
 git clone https://github.com/prof-schacht/phd-progress-tracker.git
 cd phd-progress-tracker
 
+# Set up environment variables
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
+
+# Start all services with Docker Compose
+docker-compose up -d
+
+# Services will be available at:
+# - Frontend: http://localhost:8080
+# - Backend API: http://localhost:8001
+# - PostgreSQL: localhost:5433
+# - Redis: localhost:6380
+```
+
+### Local Development Setup
+
+#### Backend
+```bash
+cd backend
+# Install dependencies with uv
+uv sync
+
+# Run migrations (when available)
+# alembic upgrade head
+
+# Start backend server
+uvicorn app.main:app --reload --port 8000
+```
+
+#### Frontend
+```bash
+cd frontend
 # Install dependencies
 npm install
 
-# Set up environment variables
-cp .env.example .env
-# Edit .env with your configuration
-
-# Run database migrations
-npm run db:migrate
-
-# Seed sample data (development only)
-npm run db:seed
-
 # Start development server
 npm run dev
-```
-
-### Docker Setup
-
-```bash
-# Build and run with Docker Compose
-docker-compose up -d
-
-# Access at http://localhost:3000
+# Frontend will be available at http://localhost:5173
 ```
 
 ## 🔧 Configuration
 
-Key configuration options in `.env`:
+### Backend Configuration (backend/.env)
 ```env
-DATABASE_URL=postgresql://user:pass@localhost:5432/phd_tracker
-REDIS_URL=redis://localhost:6379
-JWT_SECRET=your-secret-key
-REMINDER_CADENCE=biweekly
-DEFAULT_TIMEZONE=Europe/Berlin
+# Application
+PROJECT_NAME="PhD Progress Tracker"
+VERSION="0.1.0"
+
+# Security
+SECRET_KEY="your-secret-key-here-change-in-production"
+ALGORITHM="HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+
+# Database
+POSTGRES_SERVER=postgres
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_DB=phd_tracker
+
+# Redis
+REDIS_HOST=redis
+REDIS_PORT=6379
+
+# CORS
+BACKEND_CORS_ORIGINS=["http://localhost:3000","http://localhost:5173"]
+
+# First superuser
+FIRST_SUPERUSER=admin@example.com
+FIRST_SUPERUSER_PASSWORD=changethis
+```
+
+### Frontend Configuration (frontend/.env)
+```env
+VITE_API_URL=http://localhost:8001/api
+VITE_APP_NAME="PhD Progress Tracker"
+VITE_APP_VERSION=0.1.0
 ```
 
 ## 🚦 API Overview

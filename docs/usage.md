@@ -1,138 +1,153 @@
 # PhD Progress Tracker - Usage Guide
 
-## Getting Started
+## Current Implementation Status (v0.1.0)
 
-### Installation
+### What's Working
 
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd phd-progress-tracker
-```
+#### Infrastructure
+- ✅ **Docker Compose Setup**: All services containerized and orchestrated
+- ✅ **PostgreSQL Database**: Running on port 5433 with health checks
+- ✅ **Redis Cache**: Running on port 6380 for session/cache management
+- ✅ **FastAPI Backend**: Running on port 8001 with basic endpoints
+- ✅ **React Frontend**: Vite-based setup with TypeScript and TailwindCSS
 
-2. Start the application:
-```bash
-docker-compose up
-```
+#### Backend Features
+- Basic FastAPI application structure
+- Health check endpoint (`/health`)
+- Welcome endpoint (`/`)
+- CORS configuration for frontend communication
+- Environment-based configuration with Pydantic Settings
+- PostgreSQL + AsyncPG for database operations
+- Redis integration for caching
 
-3. Access the application at http://localhost:8080
+#### Frontend Features
+- React 18 with TypeScript
+- Vite for fast development and building
+- Basic API service layer for backend communication
+- Environment variable configuration
+- Version display in UI
+- Folder structure: components, pages, services, utils, types
 
-### First Time Setup
+### Getting Started
 
-1. The system creates a default admin account:
-   - Email: admin@example.com
-   - Password: changethis
+#### Using Docker (Recommended)
 
-2. Log in and immediately change the admin password
+1. **Start all services:**
+   ```bash
+   docker-compose up -d
+   ```
 
-3. Create your institution and departments
+2. **Check service status:**
+   ```bash
+   docker ps
+   ```
 
-4. Add supervisors and students
+3. **Access the application:**
+   - Backend API: http://localhost:8001
+   - Frontend: http://localhost:8080 (when Docker build is fixed)
 
-## Core Features
+4. **View logs:**
+   ```bash
+   # All services
+   docker-compose logs -f
+   
+   # Specific service
+   docker-compose logs -f backend
+   ```
 
-### For Students
+5. **Stop services:**
+   ```bash
+   docker-compose down
+   ```
 
-#### Bi-Weekly Updates
-- Submit progress updates every two weeks
-- Auto-populated with previous data
-- Takes less than 3 minutes to complete
-- Track meetings, progress, and blockers
+#### Local Development
 
-#### Research Projects
-- Manage multiple research projects
-- Set milestones and deadlines
-- Track progress visually
-- Upload relevant documents
+1. **Backend Development:**
+   ```bash
+   cd backend
+   # Create virtual environment with uv
+   uv sync
+   
+   # Run development server
+   uvicorn app.main:app --reload --port 8000
+   ```
 
-#### Quarterly Reviews
-- Comprehensive progress reviews
-- Digital signatures from supervisors
-- Export for official records
+2. **Frontend Development:**
+   ```bash
+   cd frontend
+   # Install dependencies
+   npm install
+   
+   # Start development server
+   npm run dev
+   ```
 
-### For Supervisors
+### API Endpoints
 
-#### Dashboard Overview
-- View all supervised students
-- Color-coded status indicators
-- Overdue update alerts
-- Quick access to student profiles
+Currently available endpoints:
 
-#### Progress Monitoring
-- Review bi-weekly updates
-- Add comments and feedback
-- Track meeting attendance
-- Identify at-risk students early
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/` | Welcome message with version |
+| GET | `/health` | Health check endpoint |
 
-#### Report Generation
-- Generate progress reports
-- Export student dossiers
-- Quarterly review summaries
+### Environment Variables
 
-### For Administrators
+#### Backend (.env)
+- `PROJECT_NAME`: Application name
+- `VERSION`: Application version
+- `SECRET_KEY`: JWT secret key
+- `POSTGRES_*`: Database connection settings
+- `REDIS_*`: Redis connection settings
+- `BACKEND_CORS_ORIGINS`: Allowed frontend URLs
 
-#### User Management
-- Add/remove users
-- Assign roles and permissions
-- Manage departments
-- Bulk import capabilities
+#### Frontend (.env)
+- `VITE_API_URL`: Backend API URL
+- `VITE_APP_NAME`: Application display name
+- `VITE_APP_VERSION`: Frontend version
 
-#### Analytics
-- Department-wide statistics
-- Completion rates
-- Trend analysis
-- Custom report generation
+### Troubleshooting
 
-## API Access
+#### Backend Issues
+1. **Port already in use:**
+   ```bash
+   # Check what's using port 8001
+   lsof -i :8001
+   # Kill the process or change the port in docker-compose.yml
+   ```
 
-The API is available at http://localhost:8001/api/v1
+2. **Database connection errors:**
+   - Ensure PostgreSQL container is healthy: `docker ps`
+   - Check logs: `docker-compose logs postgres`
 
-Interactive documentation: http://localhost:8001/docs
+#### Frontend Issues
+1. **Build errors:**
+   - Clear node_modules: `rm -rf node_modules && npm install`
+   - Check TypeScript errors: `npm run type-check`
 
-### Authentication
-```bash
-curl -X POST "http://localhost:8001/api/v1/auth/login" \
-  -H "Content-Type: application/json" \
-  -d '{"email": "user@example.com", "password": "password"}'
-```
+2. **API connection errors:**
+   - Verify VITE_API_URL in frontend/.env
+   - Check CORS settings in backend
 
-### Common Endpoints
-- `GET /api/v1/students` - List all students
-- `GET /api/v1/reports/bi-weekly` - Get bi-weekly reports
-- `POST /api/v1/reports/bi-weekly` - Submit new report
-- `GET /api/v1/dashboard/supervisor` - Supervisor dashboard data
+### Next Steps
 
-## Development
+The following features are planned for implementation:
 
-### Running Tests
-```bash
-make test
-```
+1. **Authentication System**
+   - User registration and login
+   - JWT token management
+   - Role-based access control
 
-### Adding New Features
-1. Create a feature branch
-2. Implement changes
-3. Add tests
-4. Submit pull request
+2. **Core Features**
+   - Student progress reporting
+   - Supervisor dashboards
+   - Milestone tracking
+   - Meeting notes
 
-### Database Migrations
-```bash
-docker-compose exec backend alembic upgrade head
-```
+3. **Database Schema**
+   - User models
+   - Report models
+   - Research project tracking
 
-## Troubleshooting
-
-### Cannot Login
-- Check credentials are correct
-- Ensure cookies are enabled
-- Clear browser cache
-
-### Missing Data
-- Check user permissions
-- Verify data was saved
-- Check browser console for errors
-
-### Performance Issues
-- Check Docker resource allocation
-- Monitor database queries
-- Enable caching in production
+For detailed implementation plans, see the GitHub issues:
+https://github.com/prof-schacht/phd-progress-tracker/issues
