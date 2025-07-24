@@ -15,7 +15,7 @@ cd phd-progress-tracker
 docker-compose up
 ```
 
-3. Access the application at http://localhost
+3. Access the application at http://localhost:8080
 
 ### First Time Setup
 
@@ -85,13 +85,13 @@ docker-compose up
 
 ## API Access
 
-The API is available at http://localhost:8000/api/v1
+The API is available at http://localhost:8001/api/v1
 
-Interactive documentation: http://localhost:8000/docs
+Interactive documentation: http://localhost:8001/docs
 
 ### Authentication
 ```bash
-curl -X POST "http://localhost:8000/api/v1/auth/login" \
+curl -X POST "http://localhost:8001/api/v1/auth/login" \
   -H "Content-Type: application/json" \
   -d '{"email": "user@example.com", "password": "password"}'
 ```

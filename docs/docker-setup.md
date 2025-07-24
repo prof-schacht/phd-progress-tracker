@@ -9,12 +9,12 @@ docker-compose up
 ```
 
 This will start:
-- PostgreSQL database (port 5432)
-- Redis cache (port 6379)
-- FastAPI backend (port 8000)
-- React frontend (port 80)
+- PostgreSQL database (port 5433)
+- Redis cache (port 6380)
+- FastAPI backend (port 8001)
+- React frontend (port 8080)
 
-Access the application at: http://localhost
+Access the application at: http://localhost:8080
 
 ## Development Setup
 
@@ -26,7 +26,7 @@ docker-compose -f docker-compose.dev.yml up
 
 This provides:
 - Backend with auto-reload on code changes
-- Frontend dev server with hot module replacement (port 5173)
+- Frontend dev server with hot module replacement (port 5174)
 - Volume mounts for live code updates
 
 ## Available Commands
@@ -54,21 +54,23 @@ Copy `.env.example` to `.env` and configure:
 
 ## Service URLs
 
-- Frontend: http://localhost (production) or http://localhost:5173 (dev)
-- Backend API: http://localhost:8000
-- API Documentation: http://localhost:8000/docs
-- PostgreSQL: localhost:5432
-- Redis: localhost:6379
+- Frontend: http://localhost:8080 (production) or http://localhost:5174 (dev)
+- Backend API: http://localhost:8001
+- API Documentation: http://localhost:8001/docs
+- PostgreSQL: localhost:5433
+- Redis: localhost:6380
 
 ## Troubleshooting
 
 ### Port Conflicts
 If you get port binding errors, ensure no other services are using:
-- 80 (nginx)
-- 5173 (vite dev server)
-- 8000 (FastAPI)
-- 5432 (PostgreSQL)
-- 6379 (Redis)
+- 8080 (nginx frontend)
+- 5174 (vite dev server)
+- 8001 (FastAPI backend)
+- 5433 (PostgreSQL)
+- 6380 (Redis)
+
+Note: We use non-standard ports to avoid conflicts with common services.
 
 ### Database Connection Issues
 The backend waits for PostgreSQL to be healthy before starting. If you see connection errors, check:

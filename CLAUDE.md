@@ -172,8 +172,18 @@ Key environment variables (see `.env.example`):
 After implementing a feature:
 1. Run backend tests: `docker-compose exec backend pytest`
 2. Run frontend tests: `docker-compose exec frontend-dev npm test`
-3. Test manually: Access http://localhost:5173 (dev) or http://localhost (prod)
-4. Check API docs: http://localhost:8000/docs
+3. Test manually: Access http://localhost:5174 (dev) or http://localhost:8080 (prod)
+4. Check API docs: http://localhost:8001/docs
+
+## Port Configuration
+
+The application uses non-standard ports to avoid conflicts:
+- Frontend: 8080 (production) / 5174 (development)
+- Backend API: 8001
+- PostgreSQL: 5433
+- Redis: 6380
+
+These ports are configured to avoid conflicts with other applications running on standard ports.
 
 ## Development Notes
 
