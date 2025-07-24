@@ -36,6 +36,7 @@ services:
       dockerfile: Dockerfile
     container_name: phd-tracker-backend-dev
     environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/phd_tracker
       - POSTGRES_SERVER=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres

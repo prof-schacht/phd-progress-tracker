@@ -20,12 +20,27 @@ class Settings(BaseSettings):
     POSTGRES_PASSWORD: str = "postgres"
     POSTGRES_DB: str = "phd_tracker"
     DATABASE_URL: Optional[str] = None
+    DATABASE_URL_SYNC: Optional[str] = None
     
     @field_validator("DATABASE_URL", mode="before")
     def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
         if isinstance(v, str):
             return v
-        return f"postgresql+asyncpg://{values.data.get('POSTGRES_USER')}:{values.data.get('POSTGRES_PASSWORD')}@{values.data.get('POSTGRES_SERVER')}/{values.data.get('POSTGRES_DB')}"
+        server = values.data.get('POSTGRES_SERVER', 'postgres')
+        user = values.data.get('POSTGRES_USER', 'postgres')
+        password = values.data.get('POSTGRES_PASSWORD', 'postgres')
+        db = values.data.get('POSTGRES_DB', 'phd_tracker')
+        return f"postgresql+asyncpg://{user}:{password}@{server}/{db}"
+    
+    @field_validator("DATABASE_URL_SYNC", mode="before")
+    def assemble_db_connection_sync(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
+        if isinstance(v, str):
+            return v
+        server = values.data.get('POSTGRES_SERVER', 'postgres')
+        user = values.data.get('POSTGRES_USER', 'postgres')
+        password = values.data.get('POSTGRES_PASSWORD', 'postgres')
+        db = values.data.get('POSTGRES_DB', 'phd_tracker')
+        return f"postgresql://{user}:{password}@{server}/{db}"
     
     # Redis
     REDIS_HOST: str = "redis"
