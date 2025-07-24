@@ -15,7 +15,10 @@ cd phd-progress-tracker
 docker-compose up
 ```
 
-3. Access the application at http://localhost:8080
+3. Access the application at:
+   - Frontend: http://localhost:5174
+   - Backend API: http://localhost:8001
+   - API Documentation: http://localhost:8001/docs
 
 ### First Time Setup
 
@@ -91,16 +94,17 @@ Interactive documentation: http://localhost:8001/docs
 
 ### Authentication
 ```bash
-curl -X POST "http://localhost:8001/api/v1/auth/login" \
+curl -X POST "http://localhost:8001/api/v1/auth/login/json" \
   -H "Content-Type: application/json" \
   -d '{"email": "user@example.com", "password": "password"}'
 ```
 
 ### Common Endpoints
-- `GET /api/v1/students` - List all students
-- `GET /api/v1/reports/bi-weekly` - Get bi-weekly reports
-- `POST /api/v1/reports/bi-weekly` - Submit new report
+- `GET /api/v1/dashboard/student` - Student dashboard data
 - `GET /api/v1/dashboard/supervisor` - Supervisor dashboard data
+- `GET /api/v1/reports/current` - Get current reporting period
+- `POST /api/v1/reports/submit` - Submit new report
+- `GET /api/v1/users` - List all users (admin only)
 
 ## Development
 
