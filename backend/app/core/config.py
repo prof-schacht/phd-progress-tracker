@@ -36,7 +36,9 @@ class Settings(BaseSettings):
     def assemble_redis_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
         if isinstance(v, str):
             return v
-        return f"redis://{values.data.get('REDIS_HOST')}:{values.data.get('REDIS_PORT')}"
+        host = values.data.get('REDIS_HOST', 'redis')
+        port = values.data.get('REDIS_PORT', 6379)
+        return f"redis://{host}:{port}"
     
     # CORS
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = ["http://localhost:3000", "http://localhost:5173"]
