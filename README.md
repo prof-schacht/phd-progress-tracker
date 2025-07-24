@@ -48,7 +48,7 @@ PhD Progress Tracker provides a centralized platform that:
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
 │   Frontend      │     │   API Gateway   │     │   Backend       │
-│   (React/Vue)   │────▶│   (Express)     │────▶│   (Node.js)     │
+│   (React/Vue)   │────▶│   (FASTAPI)     │────▶│   (Node.js)     │
 └─────────────────┘     └─────────────────┘     └─────────────────┘
                                                           │
                                                           ▼
@@ -60,17 +60,17 @@ PhD Progress Tracker provides a centralized platform that:
 
 ### Tech Stack
 - **Frontend**: React/Vue.js with TypeScript
-- **Backend**: Node.js with Express
+- **Backend**: Fastapi with Python
 - **Database**: PostgreSQL with Redis for caching
 - **Authentication**: JWT with optional SSO (SAML/OAuth2)
 - **Real-time**: WebSockets for live updates
 - **Job Queue**: Bull/BullMQ for reminders and notifications
-- **File Storage**: S3-compatible object storage
+- **File Storage**: File System object storage
 
 ## 📊 Data Model Overview
 
 ### Core Entities
-- **Users** (students, supervisors, admins)
+- **Users** (students, supervisors, admins(professors))
 - **ReportPeriods** (bi-weekly, quarterly)
 - **ReportEntries** (actual submissions)
 - **ResearchProjects** (papers, experiments, thesis chapters)
@@ -83,6 +83,7 @@ PhD Progress Tracker provides a centralized platform that:
 ### Prerequisites
 - Node.js 18+ 
 - PostgreSQL 14+
+- Fastapi
 - Redis 6+
 - npm or yarn
 
