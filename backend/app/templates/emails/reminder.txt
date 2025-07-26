@@ -1,0 +1,52 @@
+Hello {{ user_name }},
+
+{% if reminder_type == 'T-3days' %}
+REMINDER: Your {{ entity_details.title }} is due in 3 days.
+
+This is a friendly reminder that your {{ entity_details.title }} is due on {{ entity_details.due_date }}.
+
+Please make sure to submit your update before the deadline to keep your progress on track.
+
+{% elif reminder_type == 'T-0' %}
+DUE TODAY: Your {{ entity_details.title }} is due today!
+
+Your {{ entity_details.title }} is due today ({{ entity_details.due_date }}).
+
+Please submit your update as soon as possible to avoid being marked as overdue.
+
+{% elif reminder_type == 'T+2days' %}
+OVERDUE: Your {{ entity_details.title }} was due 2 days ago.
+
+Your {{ entity_details.title }} was due on {{ entity_details.due_date }} and is now 2 days overdue.
+
+Please submit your update immediately to get back on track. If you're experiencing any issues, please contact your supervisor.
+
+{% elif reminder_type == 'T+7days' %}
+URGENT: Your {{ entity_details.title }} is now 7 days overdue!
+
+Your {{ entity_details.title }} was due on {{ entity_details.due_date }} and is now 7 days overdue.
+
+This is a serious matter that requires immediate attention. Your supervisor has been notified. Please submit your update immediately or contact your supervisor to discuss any issues you may be facing.
+{% endif %}
+
+{% if entity_type == 'report_period' %}
+What to include in your report:
+- Key accomplishments during this period
+- Any blockers or challenges you faced
+- Your plans for the next period
+- Time allocation across different activities
+{% endif %}
+
+Submit your update now: {{ app_url }}/reports/submit
+
+If you have any questions or need assistance, please don't hesitate to reach out to your supervisor.
+
+Best regards,
+The PhD Progress Tracker Team
+
+--
+© {{ current_year }} PhD Progress Tracker. All rights reserved.
+Manage notification preferences: {{ app_url }}/settings/notifications
+Visit dashboard: {{ app_url }}
+
+You're receiving this email because you're registered with PhD Progress Tracker.

@@ -9,11 +9,14 @@ class TimeAllocation(BaseModel):
     writing: int = Field(ge=0, le=100)
     teaching: int = Field(ge=0, le=100, default=0)
     meetings: int = Field(ge=0, le=100, default=0)
+    commercial_projects: int = Field(ge=0, le=100, default=0)
     other: int = Field(ge=0, le=100, default=0)
     
     @validator('other')
     def validate_total(cls, v, values):
-        total = v + values.get('research', 0) + values.get('writing', 0) + values.get('teaching', 0) + values.get('meetings', 0)
+        total = (v + values.get('research', 0) + values.get('writing', 0) + 
+                values.get('teaching', 0) + values.get('meetings', 0) + 
+                values.get('commercial_projects', 0))
         if total != 100:
             raise ValueError(f'Time allocation must sum to 100%, got {total}%')
         return v
