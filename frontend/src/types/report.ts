@@ -38,6 +38,7 @@ export interface TimeAllocation {
   writing: number;
   teaching: number;
   meetings: number;
+  commercial_projects: number;
   other: number;
 }
 

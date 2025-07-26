@@ -50,11 +50,21 @@ export interface LoginRequest {
   password: string;
 }
 
+export type LoginCredentials = LoginRequest;
+
 export interface LoginResponse {
   access_token: string;
   refresh_token: string;
   token_type: string;
   expires_in: number;
+}
+
+export interface AuthResponse {
+  access_token: string;
+  refresh_token: string;
+  token_type: string;
+  expires_in: number;
+  user: User;
 }
 
 export interface RegisterRequest {

@@ -13,7 +13,9 @@ import {
   Bell,
   User,
   ChevronDown,
+  Target,
 } from 'lucide-react';
+import { NotificationDropdown } from '../notifications/NotificationDropdown';
 
 export const Layout: React.FC = () => {
   const { user, logout } = useAuth();
@@ -26,6 +28,7 @@ export const Layout: React.FC = () => {
     if (user?.role === 'student') {
       return [
         { name: 'Dashboard', href: '/dashboard/student', icon: Home },
+        { name: 'PhD Planning', href: '/phd-planning', icon: Target },
         { name: 'Reports', href: '/reports', icon: FileText },
         { name: 'Meetings', href: '/meetings', icon: Calendar },
         { name: 'Projects', href: '/projects', icon: FileText },
@@ -68,6 +71,7 @@ export const Layout: React.FC = () => {
               {/* Logo */}
               <div className="flex-shrink-0 flex items-center">
                 <h1 className="text-xl font-bold text-gray-900">PhD Tracker</h1>
+                <span className="ml-2 text-xs text-gray-500">v0.6.0</span>
               </div>
 
               {/* Desktop Navigation */}
@@ -95,10 +99,7 @@ export const Layout: React.FC = () => {
             {/* Right side */}
             <div className="hidden sm:ml-6 sm:flex sm:items-center">
               {/* Notifications */}
-              <button className="p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                <span className="sr-only">View notifications</span>
-                <Bell className="h-6 w-6" />
-              </button>
+              <NotificationDropdown />
 
               {/* Profile dropdown */}
               <div className="ml-3 relative">

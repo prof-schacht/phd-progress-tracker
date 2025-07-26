@@ -24,79 +24,61 @@ export const SupervisorDashboard: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
 
-  const { data: pendingReports, isLoading } = useQuery({
+  const { data: dashboardData, isLoading, error } = useQuery({
+    queryKey: ['supervisorDashboard'],
+    queryFn: dashboardApi.getSupervisorDashboard,
+    refetchInterval: 2 * 60 * 1000, // Refresh every 2 minutes
+  });
+
+  const { data: pendingReports } = useQuery({
     queryKey: ['pendingReports'],
     queryFn: dashboardApi.getPendingReports,
     refetchInterval: 2 * 60 * 1000, // Refresh every 2 minutes
   });
 
-  // Mock data for now
-  const mockStudents = [
-    {
-      id: 1,
-      name: 'Alice Smith',
-      email: 'alice@university.edu',
-      status: 'on_track' as const,
-      program: 'Computer Science PhD',
-      yearInProgram: 2,
-      lastReport: {
-        submittedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-        status: 'submitted',
-      },
-      upcomingDeadlines: [
-        { title: 'Bi-weekly Report', dueDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString() },
-      ],
-    },
-    {
-      id: 2,
-      name: 'Bob Chen',
-      email: 'bob@university.edu',
-      status: 'at_risk' as const,
-      program: 'Physics PhD',
-      yearInProgram: 3,
-      lastReport: {
-        submittedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
-        status: 'overdue',
-      },
-      upcomingDeadlines: [
-        { title: 'Bi-weekly Report', dueDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() },
-      ],
-    },
-    {
-      id: 3,
-      name: 'Carol Davis',
-      email: 'carol@university.edu',
-      status: 'needs_attention' as const,
-      program: 'Biology PhD',
-      yearInProgram: 1,
-      lastReport: {
-        submittedAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
-        status: 'overdue',
-      },
-      upcomingDeadlines: [
-        { title: 'Quarterly Review', dueDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString() },
-      ],
-    },
-  ];
+  // Use real API data
+  const students = dashboardData?.students || [];
 
-  const filteredStudents = mockStudents.filter(student => {
+  const filteredStudents = students.filter((student: any) => {
     const matchesSearch = student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         student.email.toLowerCase().includes(searchTerm.toLowerCase());
+                         student.email?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter = filterStatus === 'all' || student.status === filterStatus;
     return matchesSearch && matchesFilter;
   });
 
   const stats = {
-    totalStudents: mockStudents.length,
-    onTrack: mockStudents.filter(s => s.status === 'on_track').length,
-    needsAttention: mockStudents.filter(s => s.status === 'needs_attention' || s.status === 'at_risk').length,
-    pendingReviews: pendingReports?.length || 0,
+    totalStudents: students.length,
+    onTrack: students.filter((s: any) => s.status === 'on_track').length,
+    needsAttention: students.filter((s: any) => s.status === 'needs_attention' || s.status === 'at_risk').length,
+    pendingReviews: dashboardData?.pendingReviews?.length || pendingReports?.length || 0,
   };
 
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
         <LoadingSpinner size="large" message="Loading dashboard..." />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <ErrorMessage 
+          title="Failed to load dashboard" 
+          message="Please try refreshing the page or contact support if the problem persists."
+        />
+      </div>
+    );
+  }
+
+  if (!dashboardData) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <ErrorMessage 
+          title="No dashboard data" 
+          message="Unable to load supervisor dashboard data."
+        />
       </div>
     );
   }
@@ -274,24 +256,30 @@ export const SupervisorDashboard: React.FC = () => {
         {/* Students Grid/List */}
         {viewMode === 'grid' ? (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredStudents.map((student) => (
+            {filteredStudents.map((student: any) => (
               <div key={student.id} className="bg-white shadow rounded-lg hover:shadow-lg transition-shadow">
                 <div className="p-6">
                   <div className="flex items-start justify-between">
                     <div>
                       <h3 className="text-lg font-medium text-gray-900">{student.name}</h3>
-                      <p className="text-sm text-gray-500">{student.program}</p>
-                      <p className="text-sm text-gray-500">Year {student.yearInProgram}</p>
+                      <p className="text-sm text-gray-500">{student.program || 'No program specified'}</p>
+                      <p className="text-sm text-gray-500">Year {student.yearInProgram || 'N/A'}</p>
                     </div>
                     <StatusBadge status={student.status} />
                   </div>
                   
                   <div className="mt-4">
                     <p className="text-sm text-gray-600">
-                      Last report:{' '}
-                      {formatDistanceToNow(parseISO(student.lastReport.submittedAt), {
-                        addSuffix: true,
-                      })}
+                      {student.lastReport ? (
+                        <>
+                          Last report:{' '}
+                          {formatDistanceToNow(parseISO(student.lastReport.submittedAt), {
+                            addSuffix: true,
+                          })}
+                        </>
+                      ) : (
+                        'No reports submitted'
+                      )}
                     </p>
                   </div>
 
@@ -330,25 +318,27 @@ export const SupervisorDashboard: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredStudents.map((student) => (
+                {filteredStudents.map((student: any) => (
                   <tr key={student.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
                         <div className="text-sm font-medium text-gray-900">{student.name}</div>
-                        <div className="text-sm text-gray-500">{student.email}</div>
+                        <div className="text-sm text-gray-500">{student.email || 'No email'}</div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{student.program}</div>
-                      <div className="text-sm text-gray-500">Year {student.yearInProgram}</div>
+                      <div className="text-sm text-gray-900">{student.program || 'No program'}</div>
+                      <div className="text-sm text-gray-500">Year {student.yearInProgram || 'N/A'}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <StatusBadge status={student.status} />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {formatDistanceToNow(parseISO(student.lastReport.submittedAt), {
-                        addSuffix: true,
-                      })}
+                      {student.lastReport ? 
+                        formatDistanceToNow(parseISO(student.lastReport.submittedAt), {
+                          addSuffix: true,
+                        }) : 'No reports'
+                      }
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button className="text-blue-600 hover:text-blue-900 mr-3">

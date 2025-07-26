@@ -1,6 +1,6 @@
 """Dashboard service for student and supervisor dashboard data."""
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from typing import List, Dict, Any, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, and_, or_
@@ -59,11 +59,11 @@ class DashboardService:
         if report_entry:
             current_report = {
                 "id": report_entry.id,
-                "status": report_entry.status,
+                "status": "submitted" if report_entry.submitted_at else "draft",
                 "submittedAt": report_entry.submitted_at.isoformat() if report_entry.submitted_at else None,
-                "highlights": report_entry.highlights,
+                "highlights": report_entry.accomplishments,
                 "challenges": report_entry.challenges,
-                "nextSteps": report_entry.next_steps
+                "nextSteps": report_entry.next_period_plan
             }
         
         # Get previous report
@@ -84,7 +84,7 @@ class DashboardService:
                 "periodStart": prev_entry.report_period.start_date.isoformat(),
                 "periodEnd": prev_entry.report_period.end_date.isoformat(),
                 "submittedAt": prev_entry.submitted_at.isoformat() if prev_entry.submitted_at else None,
-                "nextSteps": prev_entry.next_steps
+                "nextSteps": prev_entry.next_period_plan
             }
         
         return {
@@ -448,11 +448,21 @@ class DashboardService:
                 "lastReport": last_report,
                 "upcomingDeadlines": deadlines[:2],  # Only show next 2
                 "researchPipeline": projects,
-                "program": student.student_profile.program,
-                "yearInProgram": student.student_profile.year_in_program
+                "program": student.student_profile.program_name,
+                "yearInProgram": DashboardService._calculate_year_in_program(student.student_profile.start_date)
             })
         
         return result
+    
+    @staticmethod
+    def _calculate_year_in_program(start_date: date) -> int:
+        """Calculate the year in program based on start date."""
+        today = date.today()
+        years = today.year - start_date.year
+        # Adjust if we haven't passed the anniversary yet
+        if (today.month, today.day) < (start_date.month, start_date.day):
+            years -= 1
+        return max(1, years + 1)  # Year 1, not Year 0
     
     @staticmethod
     async def _get_last_report(
@@ -476,8 +486,8 @@ class DashboardService:
             "periodStart": report.report_period.start_date.isoformat(),
             "periodEnd": report.report_period.end_date.isoformat(),
             "submittedAt": report.submitted_at.isoformat(),
-            "status": report.status,
-            "highlights": report.highlights
+            "status": "submitted" if report.submitted_at else "draft",
+            "highlights": report.accomplishments
         }
     
     @staticmethod

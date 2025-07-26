@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, LoginRequest, RegisterRequest } from '../types/auth';
-import { authApi } from '../api/auth';
+import { authService } from '../services/auth';
 import { useNavigate } from 'react-router-dom';
 
 interface AuthContextType {
@@ -40,7 +40,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const token = localStorage.getItem('access_token');
       if (token) {
         try {
-          const currentUser = await authApi.getCurrentUser();
+          const currentUser = await authService.getCurrentUser();
           setUser(currentUser);
         } catch (error) {
           console.error('Failed to fetch user:', error);
@@ -56,11 +56,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (credentials: LoginRequest) => {
     try {
-      const response = await authApi.login(credentials);
+      const response = await authService.login(credentials);
       localStorage.setItem('access_token', response.access_token);
       localStorage.setItem('refresh_token', response.refresh_token);
       
-      const currentUser = await authApi.getCurrentUser();
+      const currentUser = await authService.getCurrentUser();
       setUser(currentUser);
       
       // Navigate based on role
@@ -79,7 +79,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const register = async (data: RegisterRequest) => {
     try {
-      await authApi.register(data);
+      await authService.register(data);
       // Auto-login after registration
       await login({ email: data.email, password: data.password });
     } catch (error) {
@@ -90,7 +90,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = async () => {
     try {
-      await authApi.logout();
+      await authService.logout();
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
@@ -103,7 +103,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const refreshUser = async () => {
     try {
-      const currentUser = await authApi.getCurrentUser();
+      const currentUser = await authService.getCurrentUser();
       setUser(currentUser);
     } catch (error) {
       console.error('Failed to refresh user:', error);

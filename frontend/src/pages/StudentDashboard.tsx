@@ -25,32 +25,38 @@ export const StudentDashboard: React.FC = () => {
     refetchInterval: 5 * 60 * 1000, // Refresh every 5 minutes
   });
 
-  // Mock dashboard data for now (will be replaced with real API)
-  const dashboardData = {
-    stats: {
-      onTimeSubmissions: 85,
-      currentStreak: 5,
-      totalReports: 12,
-    },
-    researchProjects: [
-      { id: 1, title: 'Literature Review', status: 'completed', progress: 100 },
-      { id: 2, title: 'Data Collection', status: 'in_progress', progress: 60 },
-      { id: 3, title: 'Analysis', status: 'planning', progress: 10 },
-    ],
-    recentFeedback: [
-      {
-        id: 1,
-        content: 'Great progress on the literature review!',
-        author: { full_name: 'Dr. Johnson' },
-        createdAt: new Date().toISOString(),
-      },
-    ],
-  };
+  const { data: dashboardData, isLoading: dashboardLoading, error } = useQuery({
+    queryKey: ['studentDashboard'],
+    queryFn: dashboardApi.getStudentDashboard,
+    refetchInterval: 5 * 60 * 1000, // Refresh every 5 minutes
+  });
 
-  if (periodLoading) {
+  if (periodLoading || dashboardLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
         <LoadingSpinner size="large" message="Loading dashboard..." />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <ErrorMessage 
+          title="Failed to load dashboard" 
+          message="Please try refreshing the page or contact support if the problem persists."
+        />
+      </div>
+    );
+  }
+
+  if (!dashboardData) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <ErrorMessage 
+          title="No dashboard data" 
+          message="Unable to load your dashboard data."
+        />
       </div>
     );
   }
@@ -65,7 +71,7 @@ export const StudentDashboard: React.FC = () => {
           </h1>
           <div className="mt-2 flex items-center text-sm text-gray-600">
             <Zap className="mr-1 h-4 w-4 text-yellow-500" />
-            <span className="font-medium">{dashboardData.stats.currentStreak} day streak</span>
+            <span className="font-medium">{dashboardData.stats?.currentStreak || 0} day streak</span>
           </div>
         </div>
 
@@ -74,10 +80,10 @@ export const StudentDashboard: React.FC = () => {
           {/* Left Column - Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Next Deadline */}
-            {currentPeriod?.period && (
+            {dashboardData.currentPeriod?.period && (
               <DeadlineCountdown
                 title="Bi-weekly Update"
-                dueDate={currentPeriod.period.due_date}
+                dueDate={dashboardData.currentPeriod.period.endDate}
                 onAction={() => window.location.href = '/reports/submit'}
               />
             )}
@@ -88,25 +94,29 @@ export const StudentDashboard: React.FC = () => {
                 Your Research Pipeline
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {dashboardData.researchProjects.map((project) => (
-                  <div
-                    key={project.id}
-                    className="border rounded-lg p-4 hover:shadow-md transition-shadow"
-                  >
-                    <h3 className="font-medium text-gray-900">{project.title}</h3>
-                    <div className="mt-3">
-                      <ProgressRing
-                        progress={project.progress}
-                        size={80}
-                        strokeWidth={6}
-                        showPercentage={true}
-                      />
+                {dashboardData.researchProjects?.length > 0 ? (
+                  dashboardData.researchProjects.map((project: any) => (
+                    <div
+                      key={project.id}
+                      className="border rounded-lg p-4 hover:shadow-md transition-shadow"
+                    >
+                      <h3 className="font-medium text-gray-900">{project.title}</h3>
+                      <div className="mt-3">
+                        <ProgressRing
+                          progress={project.progress || 0}
+                          size={80}
+                          strokeWidth={6}
+                          showPercentage={true}
+                        />
+                      </div>
+                      <p className="mt-2 text-xs text-gray-500 capitalize">
+                        {project.status?.replace('_', ' ') || 'Unknown'}
+                      </p>
                     </div>
-                    <p className="mt-2 text-xs text-gray-500 capitalize">
-                      {project.status.replace('_', ' ')}
-                    </p>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-500 col-span-3">No research projects yet</p>
+                )}
               </div>
             </div>
 
@@ -116,7 +126,7 @@ export const StudentDashboard: React.FC = () => {
                 Recent Progress
               </h2>
               <div className="space-y-3">
-                {currentPeriod?.previousReport ? (
+                {dashboardData.currentPeriod?.previousReport ? (
                   <div className="flex items-start">
                     <div className="flex-shrink-0">
                       <div className="h-2 w-2 rounded-full bg-green-500 mt-2"></div>
@@ -124,12 +134,13 @@ export const StudentDashboard: React.FC = () => {
                     <div className="ml-3">
                       <p className="text-sm text-gray-900">
                         Last report submitted{' '}
-                        {formatDistanceToNow(parseISO(currentPeriod.previousReport.submitted_at), {
-                          addSuffix: true,
-                        })}
+                        {dashboardData.currentPeriod.previousReport.submittedAt ? 
+                          formatDistanceToNow(parseISO(dashboardData.currentPeriod.previousReport.submittedAt), {
+                            addSuffix: true,
+                          }) : 'recently'}
                       </p>
                       <p className="text-sm text-gray-600 mt-1">
-                        {currentPeriod.previousReport.accomplishments.substring(0, 100)}...
+                        {dashboardData.currentPeriod.previousReport.nextSteps?.substring(0, 100) || 'No details available'}...
                       </p>
                     </div>
                   </div>
@@ -151,13 +162,15 @@ export const StudentDashboard: React.FC = () => {
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">On-time submissions</span>
                   <span className="text-2xl font-bold text-green-600">
-                    {dashboardData.stats.onTimeSubmissions}%
+                    {dashboardData.stats?.totalReports > 0 
+                      ? Math.round((dashboardData.stats.onTimeSubmissions / dashboardData.stats.totalReports) * 100)
+                      : 0}%
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">Total reports</span>
                   <span className="text-2xl font-bold text-gray-900">
-                    {dashboardData.stats.totalReports}
+                    {dashboardData.stats?.totalReports || 0}
                   </span>
                 </div>
               </div>
@@ -185,17 +198,17 @@ export const StudentDashboard: React.FC = () => {
             </div>
 
             {/* Recent Feedback */}
-            {dashboardData.recentFeedback.length > 0 && (
+            {dashboardData.recentFeedback?.length > 0 && (
               <div className="bg-white rounded-lg shadow p-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">
                   Recent Feedback
                 </h2>
                 <div className="space-y-3">
-                  {dashboardData.recentFeedback.map((feedback) => (
+                  {dashboardData.recentFeedback.map((feedback: any) => (
                     <div key={feedback.id} className="text-sm">
                       <p className="text-gray-900">{feedback.content}</p>
                       <p className="text-gray-500 mt-1">
-                        — {feedback.author.full_name}
+                        — {feedback.author?.full_name || 'Unknown'}
                       </p>
                     </div>
                   ))}

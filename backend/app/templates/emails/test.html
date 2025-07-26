@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Test Email - PhD Progress Tracker{% endblock %}
+
+{% block content %}
+<h2>Test Email Successful!</h2>
+
+<p>Hello {{ user_name }},</p>
+
+<p>This is a test email from PhD Progress Tracker to verify that your email configuration is working correctly.</p>
+
+<p>If you're seeing this message, it means:</p>
+<ul>
+    <li>✅ Email sending is properly configured</li>
+    <li>✅ Templates are rendering correctly</li>
+    <li>✅ You can receive notifications from the system</li>
+</ul>
+
+<p style="text-align: center;">
+    <a href="{{ app_url }}" class="button">Visit Dashboard</a>
+</p>
+
+<p>Thank you for using PhD Progress Tracker!</p>
+
+<p>Best regards,<br>
+The PhD Progress Tracker Team</p>
+{% endblock %}

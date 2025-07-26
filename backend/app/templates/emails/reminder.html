@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Reminder - PhD Progress Tracker{% endblock %}
+
+{% block content %}
+<h2>Hello {{ user_name }},</h2>
+
+{% if reminder_type == 'T-3days' %}
+    <div class="alert alert-warning">
+        <strong>Reminder:</strong> Your {{ entity_details.title }} is due in 3 days.
+    </div>
+    
+    <p>This is a friendly reminder that your {{ entity_details.title }} is due on <strong>{{ entity_details.due_date }}</strong>.</p>
+    
+    <p>Please make sure to submit your update before the deadline to keep your progress on track.</p>
+
+{% elif reminder_type == 'T-0' %}
+    <div class="alert alert-danger">
+        <strong>Due Today:</strong> Your {{ entity_details.title }} is due today!
+    </div>
+    
+    <p>Your {{ entity_details.title }} is due <strong>today</strong> ({{ entity_details.due_date }}).</p>
+    
+    <p>Please submit your update as soon as possible to avoid being marked as overdue.</p>
+
+{% elif reminder_type == 'T+2days' %}
+    <div class="alert alert-danger">
+        <strong>Overdue:</strong> Your {{ entity_details.title }} was due 2 days ago.
+    </div>
+    
+    <p>Your {{ entity_details.title }} was due on {{ entity_details.due_date }} and is now <strong>2 days overdue</strong>.</p>
+    
+    <p>Please submit your update immediately to get back on track. If you're experiencing any issues, please contact your supervisor.</p>
+
+{% elif reminder_type == 'T+7days' %}
+    <div class="alert alert-danger">
+        <strong>Urgent:</strong> Your {{ entity_details.title }} is now 7 days overdue!
+    </div>
+    
+    <p>Your {{ entity_details.title }} was due on {{ entity_details.due_date }} and is now <strong>7 days overdue</strong>.</p>
+    
+    <p>This is a serious matter that requires immediate attention. Your supervisor has been notified. Please submit your update immediately or contact your supervisor to discuss any issues you may be facing.</p>
+{% endif %}
+
+{% if entity_type == 'report_period' %}
+    <p><strong>What to include in your report:</strong></p>
+    <ul>
+        <li>Key accomplishments during this period</li>
+        <li>Any blockers or challenges you faced</li>
+        <li>Your plans for the next period</li>
+        <li>Time allocation across different activities</li>
+    </ul>
+{% endif %}
+
+<p style="text-align: center;">
+    <a href="{{ app_url }}/reports/submit" class="button">Submit Update Now</a>
+</p>
+
+<p>If you have any questions or need assistance, please don't hesitate to reach out to your supervisor.</p>
+
+<p>Best regards,<br>
+The PhD Progress Tracker Team</p>
+{% endblock %}

@@ -35,6 +35,10 @@ class User(Base):
     profile = relationship("UserProfile", back_populates="user", uselist=False, cascade="all, delete-orphan")
     student_profile = relationship("StudentProfile", foreign_keys="StudentProfile.user_id", 
                                  back_populates="student", uselist=False, cascade="all, delete-orphan")
+    phd_plan = relationship("PhDPlan", foreign_keys="PhDPlan.student_id", 
+                          back_populates="student", uselist=False, cascade="all, delete-orphan")
+    notification_preference = relationship("NotificationPreference", back_populates="user", uselist=False, cascade="all, delete-orphan")
+    notification_logs = relationship("NotificationLog", back_populates="user", cascade="all, delete-orphan")
     
     def __repr__(self):
         return f"<User(id={self.id}, email='{self.email}', role='{self.role}')>"

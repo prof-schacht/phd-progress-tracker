@@ -1,0 +1,23 @@
+Test Email Successful!
+
+Hello {{ user_name }},
+
+This is a test email from PhD Progress Tracker to verify that your email configuration is working correctly.
+
+If you're seeing this message, it means:
+- Email sending is properly configured
+- Templates are rendering correctly
+- You can receive notifications from the system
+
+Visit Dashboard: {{ app_url }}
+
+Thank you for using PhD Progress Tracker!
+
+Best regards,
+The PhD Progress Tracker Team
+
+--
+© {{ current_year }} PhD Progress Tracker. All rights reserved.
+Visit dashboard: {{ app_url }}
+
+You're receiving this email because you're registered with PhD Progress Tracker.

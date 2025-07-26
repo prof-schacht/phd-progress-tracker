@@ -5,7 +5,7 @@ from pydantic import AnyHttpUrl, field_validator
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "PhD Progress Tracker"
-    VERSION: str = "0.1.0"
+    VERSION: str = "0.6.0"
     API_V1_STR: str = "/api/v1"
     
     # Security
@@ -55,6 +55,18 @@ class Settings(BaseSettings):
     
     # CORS
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = ["http://localhost:3000", "http://localhost:5173", "http://localhost:5174"]
+    
+    # Email settings
+    SMTP_TLS: bool = False  # Mailhog doesn't use TLS
+    SMTP_HOST: str = ""  # Empty for development - will log emails instead
+    SMTP_PORT: int = 1025
+    SMTP_USER: str = ""
+    SMTP_PASSWORD: str = ""
+    EMAILS_FROM_EMAIL: str = "noreply@phd-tracker.com"
+    EMAILS_FROM_NAME: str = "PhD Progress Tracker"
+    
+    # Frontend URL for email links
+    FRONTEND_URL: str = "http://localhost:5174"
     
     @field_validator("BACKEND_CORS_ORIGINS", mode="before")
     def assemble_cors_origins(cls, v: Union[str, List[str]]) -> Union[List[str], str]:

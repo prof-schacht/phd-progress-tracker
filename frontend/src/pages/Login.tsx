@@ -130,15 +130,15 @@ export const Login: React.FC = () => {
 
         {/* Demo credentials hint */}
         <div className="mt-6 p-4 bg-blue-50 rounded-md">
-          <p className="text-sm text-blue-800 font-medium">Demo Credentials:</p>
+          <p className="text-sm text-blue-800 font-medium">Demo Credentials (password: password123):</p>
           <p className="text-sm text-blue-700 mt-1">
-            Admin: admin@example.com / changethis
+            Student: student@phd-tracker.com
           </p>
           <p className="text-sm text-blue-700">
-            Student: student@phd-tracker.com / password
+            Supervisor: supervisor@phd-tracker.com
           </p>
           <p className="text-sm text-blue-700">
-            Supervisor: supervisor@phd-tracker.com / password
+            Admin: admin@example.com
           </p>
         </div>
       </div>
